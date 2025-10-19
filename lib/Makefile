@@ -57,6 +57,10 @@ ALLFLAGS = $(CFLAGS) $(CPPFLAGS) $(LDFLAGS)
 SRCFILES := $(sort $(wildcard *.c))
 OBJFILES = $(SRCFILES:.c=.o)
 
+# LZ4M specific targets
+LZ4M_SRCFILES := lz4m.c
+LZ4M_OBJFILES = $(LZ4M_SRCFILES:.c=.o)
+
 include ../build/make/lz4defs.make
 
 # default is defined as the first target in Makefile, hence before multiconf.make
@@ -96,7 +100,7 @@ lib-release: DEBUGFLAGS :=
 lib-release: lib liblz4.pc
 
 .PHONY: lib
-lib: liblz4.a liblz4
+lib: liblz4.a liblz4 liblz4m.a liblz4m
 
 .PHONY: all
 all: lib liblz4.pc
@@ -108,6 +112,12 @@ all32: all
 liblz4.a:
 ifeq ($(BUILD_STATIC),yes)
 $(eval $(call static_library,liblz4.a,$(OBJFILES)))
+endif
+
+# LZ4M static library
+liblz4m.a:
+ifeq ($(BUILD_STATIC),yes)
+$(eval $(call static_library,liblz4m.a,$(LZ4M_OBJFILES)))
 endif
 
 ifeq ($(WINBASED),yes)
@@ -136,6 +146,12 @@ else   # not windows
 $(LIBLZ4): LDFLAGS += -fvisibility=hidden $(SONAME_FLAGS)
 ifeq ($(BUILD_SHARED),yes)
 $(eval $(call c_dynamic_library,$(LIBLZ4),$(OBJFILES),,echo "$(LIBLZ4) created"))
+endif
+
+# LZ4M dynamic library for non-Windows
+$(LIBLZ4M): LDFLAGS += -fvisibility=hidden $(SONAME_FLAGS)
+ifeq ($(BUILD_SHARED),yes)
+$(eval $(call c_dynamic_library,$(LIBLZ4M),$(LZ4M_OBJFILES),,echo "$(LIBLZ4M) created"))
 endif
 
 endif
