@@ -389,8 +389,8 @@ _next_match:
             }
         }
         
-        /* No match found */
-        ip += 1;
+        /* No match found - skip forward 4 bytes as per paper's approach */
+        ip += 4;
     }
     
 _last_literals:
