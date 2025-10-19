@@ -540,15 +540,15 @@ static int LZ4M_decompress_generic(
                 
                 /* Copy in 4-byte chunks - LZ4M uses 4-byte granularity */
                 while (op < cpy) {
-                    *(U32*)op = *(U32*)match;
+                    memcpy(op, match, 4);
                     op += 4; match += 4;
                 }
             } else {
                 /* Use wildcopy for better performance */
                 do {
-                    *(U32*)op = *(U32*)match;  /* 4-byte granularity */
+                    memcpy(op, match, 4);
                     op += 4; match += 4;
-                    *(U32*)op = *(U32*)match;
+                    memcpy(op, match, 4);
                     op += 4; match += 4;
                 } while (op < cpy);
             }
